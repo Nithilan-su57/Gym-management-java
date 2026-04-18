@@ -37,6 +37,25 @@ public class Member {
         this.membershipPlan = membershipPlan;
         this.joinDate = LocalDate.now();
     }
+    public void calculateExpiry(){
+        if (this.membershipPlan == null ){
+            return;
+        }
+        LocalDate today = LocalDate.now();
+        switch (this.membershipPlan.toUpperCase()){
+            case "MONTHLY" :
+                this.expiryDate = today.plusMonths(1);
+                break;
+            case "QUARTERLY":
+                this.expiryDate = today.plusMonths(3);
+                break;
+            case "YEARLY" :
+                this.expiryDate = today.plusYears(1);
+                break;
+            default:
+                this.expiryDate=today;
+        }
+    }
 
 
     public Long getId() {
