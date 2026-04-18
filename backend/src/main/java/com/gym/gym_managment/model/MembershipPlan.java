@@ -1,6 +1,6 @@
 package com.gym.gym_managment.model;
 import jakarta.persistence.*;
-
+//
 @Entity
 @Table(name = "membership_plans")
 public class MembershipPlan {
@@ -22,8 +22,10 @@ public class MembershipPlan {
     //  Returns a formatted string of the plan details for the frontend.
 
     public String getPlanDetails() {
-        return String.format("Plan: %s | Base Price: %.2f | Current Discount: %.1f%% | Final Price: %.2f",
-                planName, basePrice, discountPercentage, getDiscountedPrice());
+        return "Plan: " + planName +
+                " | Base Price: " + basePrice +
+                " | Current Discount: " + discountPercentage + "%" +
+                " | Final Price: " + getDiscountedPrice();
     }
 
     public Long getId() {

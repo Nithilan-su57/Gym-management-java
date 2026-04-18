@@ -1,7 +1,16 @@
 package com.gym.gym_managment.controller;
+
+import com.gym.gym_managment.model.MembershipPlan;
+import com.gym.gym_managment.repository.MembershipPlanRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/plans")
 @CrossOrigin(origins = "*")
+
 public class MembershipPlanController {
     @Autowired
     private MembershipPlanRepository planRepository;
