@@ -116,4 +116,9 @@ public class Member {
     public void setJoinDate(LocalDate joinDate) {
         this.joinDate = joinDate;
     }
+
+    public LocalDate getExpiryDate() {return expiryDate;}
+
+    public void setExpiryDate(LocalDate expiryDate) {this.expiryDate = expiryDate;}
+
 }
