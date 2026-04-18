@@ -57,6 +57,13 @@ public class Member {
         }
     }
 
+    public void renewMembership(int monthsToAdd) {
+        if (this.expiryDate == null || this.expiryDate.isBefore(LocalDate.now())) {
+            this.expiryDate = LocalDate.now().plusMonths(monthsToAdd);
+        } else {
+            this.expiryDate = this.expiryDate.plusMonths(monthsToAdd);
+        }
+    }
 
     public Long getId() {
         return id;
