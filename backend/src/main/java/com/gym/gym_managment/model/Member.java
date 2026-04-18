@@ -25,6 +25,8 @@ public class Member {
     private String phoneNumber;
     private String membershipPlan;
     private LocalDate joinDate;
+    private LocalDate expiryDate;
+
     public Member() {
     }
 
