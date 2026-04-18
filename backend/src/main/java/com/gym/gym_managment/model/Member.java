@@ -2,6 +2,7 @@ package com.gym.gym_managment.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 @Entity
 @Table(name = "members")
