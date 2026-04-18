@@ -65,6 +65,10 @@ public class Member {
         }
     }
 
+    public boolean checkAccess() {
+        if (this.expiryDate == null){ return false;}
+        return !this.expiryDate.isBefore(LocalDate.now());
+    }
     public Long getId() {
         return id;
     }
