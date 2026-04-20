@@ -1,7 +1,7 @@
 package com.gym.gym_managment.controller;
 
 import com.gym.gym_managment.model.Member;
-import com.gym.gym_managment.model.GymManagerService;
+import com.gym.gym_managment.service.GymManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

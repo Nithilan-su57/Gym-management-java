@@ -1,4 +1,4 @@
-package com.gym.gym_managment.model;
+package com.gym.gym_managment.service;
 
 import com.gym.gym_managment.model.Member;
 import com.gym.gym_managment.model.MembershipPlan;

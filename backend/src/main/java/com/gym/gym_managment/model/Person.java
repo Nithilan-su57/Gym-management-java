@@ -27,7 +27,6 @@ public abstract class Person {
         this.phoneNumber = phoneNumber;
     }
 
-    // This is the method you asked for
     public void displayProfile() {
         System.out.println("--- Profile Details ---");
         System.out.println("Name         : " + this.name);
