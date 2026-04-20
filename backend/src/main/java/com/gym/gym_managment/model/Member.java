@@ -8,7 +8,7 @@ import java.time.temporal.ChronoUnit;
 @Table(name = "members")
 //@Entity: This is the most important part. It tells Spring Boot: "This class isn't just a regular Java
 // class; it's a database table."
-public class Member {
+public class Member extends Person{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,7 +17,7 @@ public class Member {
     private long id;
 
     @Column(nullable = false)
-    //tells the database generation to create not null values , if it does it will throw sql exception.
+    //tells the database generation to create not null values , if it does it will throw SQL exception.
     private String name;
     @Column(unique = true, nullable = false)
     //ensures no two rows in the database table can have the same values ,if it does it will throw an exception.
@@ -37,6 +37,14 @@ public class Member {
         this.membershipPlan = membershipPlan;
         this.joinDate = LocalDate.now();
     }
+    @Override
+    public void displayProfile() {
+        super.displayProfile(); // Call the parent method first
+        System.out.println("Plan         : " + this.membershipPlan);
+        System.out.println("Expiry Date  : " + this.expiryDate);
+        System.out.println("-----------------------");
+    }
+
     public void calculateExpiry(){
         if (this.membershipPlan == null ){
             return;
