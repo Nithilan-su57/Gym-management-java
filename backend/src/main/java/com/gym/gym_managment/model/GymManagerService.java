@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-
+//
 @Service // Tells Spring this is a business logic class
 public class GymManagerService {
 

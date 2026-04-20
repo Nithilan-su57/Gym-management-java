@@ -14,7 +14,7 @@ public class GymManagerController {
 
     @Autowired
     private GymManagerService managerService;
-
+//
     // Triggered by the Manager to clean the database
     @DeleteMapping("/cleanup")
     public String cleanup() {
