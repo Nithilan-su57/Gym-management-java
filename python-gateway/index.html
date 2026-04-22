@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Gym Manager | Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>GYM<span>CORE</span></h1>
+            <div id="revenue-badge">Revenue: ₹<span id="total-revenue">0</span></div>
+        </header>
+
+        <section class="grid">
+            <div class="card">
+                <h3>Add New Member</h3>
+                <form id="memberForm">
+                    <input type="text" id="name" placeholder="Full Name" required>
+                    <input type="email" id="email" placeholder="Email Address" required>
+                    <select id="plan_name">
+                        <option value="Monthly">Monthly</option>
+                        <option value="Quarterly">Quarterly</option>
+                        <option value="Yearly">Yearly</option>
+                    </select>
+                    <button type="submit">Register Member</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h3>Active Members</h3>
+                <ul id="memberList"></ul>
+            </div>
+        </section>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException, Depends
 from sqlalchemy import create_engine, Column, Integer, String, Float
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
+from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 
 # 1. Database Setup (Creates a local file 'gym.db')
@@ -79,3 +80,11 @@ def revenue_report(db: Session = Depends(get_db)):
 @app.get("/members/")
 def list_members(db: Session = Depends(get_db)):
     return db.query(Member).all()
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], # Allows your HTML file to talk to the API
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
