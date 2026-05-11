@@ -1,90 +1,104 @@
-from fastapi import FastAPI, HTTPException, Depends
-from sqlalchemy import create_engine, Column, Integer, String, Float
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from typing import List
+from pydantic import BaseModel
+import requests
+from typing import List, Optional
 
-# 1. Database Setup (Creates a local file 'gym.db')
-SQLALCHEMY_DATABASE_URL = "sqlite:///./gym.db"
-engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
+app = FastAPI()
 
-# 2. Database Models
-class Plan(Base):
-    __tablename__ = "plans"
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, unique=True) # Monthly, Quarterly, Yearly
-    price = Column(Float)
-    discount = Column(Float)
-
-class Member(Base):
-    __tablename__ = "members"
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String)
-    email = Column(String, unique=True)
-    plan_name = Column(String)
-
-Base.metadata.create_all(bind=engine)
-
-# 3. FastAPI App
-app = FastAPI(title="Gym Management API")
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-# --- ENDPOINTS FOR FRONTEND DEVS ---
-
-@app.post("/plans/")
-def create_plan(name: str, price: float, discount: float, db: Session = Depends(get_db)):
-    db_plan = Plan(name=name, price=price, discount=discount)
-    db.add(db_plan)
-    db.commit()
-    return {"message": "Plan Created", "data": db_plan}
-
-@app.post("/register/")
-def register_member(name: str, email: str, plan_name: str, db: Session = Depends(get_db)):
-    # Verify plan exists
-    plan = db.query(Plan).filter(Plan.name == plan_name).first()
-    if not plan:
-        raise HTTPException(status_code=404, detail="Plan name not found in system")
-    
-    new_member = Member(name=name, email=email, plan_name=plan_name)
-    db.add(new_member)
-    db.commit()
-    return {"message": "Member Registered", "member": name}
-
-@app.get("/report/")
-def revenue_report(db: Session = Depends(get_db)):
-    members = db.query(Member).all()
-    total_revenue = 0.0
-    
-    for m in members:
-        plan = db.query(Plan).filter(Plan.name == m.plan_name).first()
-        if plan:
-            # Calculation: Price - Discount%
-            final_price = plan.price * (1 - (plan.discount / 100))
-            total_revenue += final_price
-            
-    return {
-        "total_members": len(members),
-        "total_revenue": round(total_revenue, 2),
-        "currency": "INR"
-    }
-
-@app.get("/members/")
-def list_members(db: Session = Depends(get_db)):
-    return db.query(Member).all()
-
-
+# Enable CORS so your app.js (running on a different port/file) can communicate
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Allows your HTML file to talk to the API
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Configuration: Java Spring Boot Backend URL
+JAVA_BACKEND_URL = "http://localhost:8080/api"
+
+# --- Pydantic Models for JSON Requests ---
+
+class MemberRequest(BaseModel):
+    name: str
+    email: str
+    phoneNumber: str
+    membershipPlan: str  # Frontend sends plan name string
+
+class PlanRequest(BaseModel):
+    planName: str
+    basePrice: float
+    discountPercentage: float = 0.0
+    features: Optional[str] = "Standard gym access"
+
+# --- 1. Member Routes (/api/members) ---
+
+@app.get("/members/all")
+async def get_all_members():
+    """Fetches all members from Java MemberController[cite: 7]"""
+    response = requests.get(f"{JAVA_BACKEND_URL}/members/all")
+    return response.json()
+
+@app.post("/members/register")
+async def register_member(member: MemberRequest):
+    """Proxies registration to Java MemberController[cite: 7]"""
+    # Note: Java backend expects a plan object or ID. 
+    # We map the string planName to the format Java expects.
+    payload = {
+        "name": member.name,
+        "email": member.email,
+        "phoneNumber": member.phoneNumber,
+        "membershipPlan": {"planName": member.membershipPlan} 
+    }
+    response = requests.post(f"{JAVA_BACKEND_URL}/members/register", json=payload)
+    return response.json()
+
+@app.get("/members/{member_id}/access")
+async def check_access(member_id: int):
+    """Checks access via Java MemberController[cite: 7]"""
+    response = requests.get(f"{JAVA_BACKEND_URL}/members/{member_id}/access")
+    return response.text  # Returns "Access Granted" or "Access Denied"
+
+@app.post("/members/{member_id}/renew")
+async def renew_membership(member_id: int, months: int = Query(...)):
+    """Renews membership via Java MemberController[cite: 7]"""
+    response = requests.post(f"{JAVA_BACKEND_URL}/members/{member_id}/renew", params={"months": months})
+    return response.json()
+
+# --- 2. Plan Routes (/api/plans) ---
+
+@app.get("/plans/all")
+async def get_all_plans():
+    """Fetches all plans from Java MembershipPlanController[cite: 8]"""
+    response = requests.get(f"{JAVA_BACKEND_URL}/plans/all")
+    return response.json()
+
+@app.post("/plans/create")
+async def create_plan(plan: PlanRequest):
+    """Creates plan via Java MembershipPlanController[cite: 8]"""
+    response = requests.post(f"{JAVA_BACKEND_URL}/plans/create", json=plan.dict())
+    return response.json()
+
+@app.put("/plans/{plan_id}/set-discount")
+async def set_discount(plan_id: int, discount: float = Query(...)):
+    """Updates discount via Java MembershipPlanController[cite: 8]"""
+    response = requests.put(f"{JAVA_BACKEND_URL}/plans/{plan_id}/set-discount", params={"discount": discount})
+    return response.json()
+
+# --- 3. Manager Routes (/api/manager) ---
+
+@app.get("/manager/report")
+async def get_report():
+    """Fetches revenue report from Java GymManagerController[cite: 6]"""
+    response = requests.get(f"{JAVA_BACKEND_URL}/manager/report")
+    return response.text
+
+@app.delete("/manager/cleanup")
+async def cleanup_expired():
+    """Triggers expired member removal in Java GymManagerController[cite: 6]"""
+    response = requests.delete(f"{JAVA_BACKEND_URL}/manager/cleanup")
+    return response.text
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="127.0.0.1", port=8000)
