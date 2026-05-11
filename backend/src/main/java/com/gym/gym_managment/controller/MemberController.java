@@ -9,7 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/members")
-@CrossOrigin(origins = "*") // Allows your team's frontend/FastAPI to access this
+@CrossOrigin(origins = "http://localhost:3000") // Allow React/Web access // Allows your team's frontend/FastAPI to access this
 public class MemberController {
 
     @Autowired
